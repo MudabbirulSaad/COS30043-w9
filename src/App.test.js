@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest'
 
 import App from './App.vue'
 
+const visibleRows = (wrapper) => wrapper.findAll('tbody tr')
+
 describe('App', () => {
   it('renders the lab title', () => {
     const wrapper = mount(App)
@@ -20,8 +22,6 @@ describe('App', () => {
     expect(wrapper.text()).toContain('Type')
     expect(wrapper.text()).toContain('ICT10001')
     expect(wrapper.text()).toContain('Problem Solving with ICT')
-    expect(wrapper.text()).toContain('INF30001')
-    expect(wrapper.text()).toContain('Systems Acquisition & Implementation Management')
   })
 
   it('filters units by unit code', async () => {
@@ -43,11 +43,34 @@ describe('App', () => {
 
     await search.setValue('12.5')
     expect(wrapper.text()).toContain('ICT10001')
-    expect(wrapper.text()).toContain('INF30001')
+    expect(visibleRows(wrapper)).toHaveLength(5)
 
     await search.setValue('software development')
     expect(wrapper.text()).toContain('COS20001')
     expect(wrapper.text()).toContain('COS20016')
     expect(wrapper.text()).not.toContain('ACC20014')
+  })
+
+  it('shows five units on the first page by default', () => {
+    const wrapper = mount(App)
+
+    expect(visibleRows(wrapper)).toHaveLength(5)
+    expect(wrapper.text()).toContain('ICT10001')
+    expect(wrapper.text()).toContain('COS20001')
+    expect(wrapper.text()).not.toContain('TNE10005')
+  })
+
+  it('moves to the next page with pagination controls', async () => {
+    const wrapper = mount(App)
+    const pageTwoLink = wrapper
+      .findAll('.page-link')
+      .find((link) => link.text() === '2')
+
+    await pageTwoLink.trigger('click')
+
+    expect(visibleRows(wrapper)).toHaveLength(5)
+    expect(wrapper.text()).toContain('TNE10005')
+    expect(wrapper.text()).toContain('ACC10007')
+    expect(wrapper.text()).not.toContain('ICT10001')
   })
 })

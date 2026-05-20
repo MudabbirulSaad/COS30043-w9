@@ -24,7 +24,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="unit in filteredUnits" :key="unit.code">
+          <tr v-for="unit in paginatedUnits" :key="unit.code">
             <td class="fw-semibold">{{ unit.code }}</td>
             <td>{{ unit.desc }}</td>
             <td>{{ unit.cp }}</td>
@@ -33,14 +33,34 @@
         </tbody>
       </table>
     </div>
+
+    <Paginate
+      v-if="pageCount > 1"
+      v-model="currentPage"
+      :page-count="pageCount"
+      :click-handler="changePage"
+      :prev-text="'Previous'"
+      :next-text="'Next'"
+      :container-class="'pagination justify-content-center'"
+      :page-class="'page-item'"
+      :page-link-class="'page-link'"
+      :prev-class="'page-item'"
+      :prev-link-class="'page-link'"
+      :next-class="'page-item'"
+      :next-link-class="'page-link'"
+      :active-class="'active'"
+    />
   </main>
 </template>
 
 <script setup>
 import { computed, ref } from 'vue'
+import Paginate from 'vuejs-paginate-next'
 import units from '../units.json'
 
 const searchTerm = ref('')
+const currentPage = ref(1)
+const rowsPerPage = 5
 
 const filteredUnits = computed(() => {
   const query = searchTerm.value.trim().toLowerCase()
@@ -55,4 +75,17 @@ const filteredUnits = computed(() => {
     )
   })
 })
+
+const paginatedUnits = computed(() => {
+  const start = (currentPage.value - 1) * rowsPerPage
+  const end = start + rowsPerPage
+
+  return filteredUnits.value.slice(start, end)
+})
+
+const pageCount = computed(() => Math.ceil(filteredUnits.value.length / rowsPerPage))
+
+function changePage(page) {
+  currentPage.value = page
+}
 </script>
