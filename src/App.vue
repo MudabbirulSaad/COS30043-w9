@@ -2,15 +2,25 @@
   <main class="container py-4">
     <h1 class="mb-3">Lab 09 Pagination</h1>
 
-    <div class="mb-3">
-      <label for="unit-search" class="form-label">Search units</label>
-      <input
-        id="unit-search"
-        v-model="searchTerm"
-        type="search"
-        class="form-control"
-        placeholder="Search by code, description, credit points, or type"
-      >
+    <div class="row g-3 align-items-end mb-3">
+      <div class="col-12 col-md-8">
+        <label for="unit-search" class="form-label">Search units</label>
+        <input
+          id="unit-search"
+          v-model="searchTerm"
+          type="search"
+          class="form-control"
+          placeholder="Search by code, description, credit points, or type"
+        >
+      </div>
+      <div class="col-12 col-md-4">
+        <label for="rows-per-page" class="form-label">Rows per page</label>
+        <select id="rows-per-page" v-model="rowsPerPage" class="form-select">
+          <option :value="5">5</option>
+          <option :value="10">10</option>
+          <option value="all">All</option>
+        </select>
+      </div>
     </div>
 
     <div class="table-responsive">
@@ -54,13 +64,13 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import Paginate from 'vuejs-paginate-next'
 import units from '../units.json'
 
 const searchTerm = ref('')
 const currentPage = ref(1)
-const rowsPerPage = 5
+const rowsPerPage = ref(5)
 
 const filteredUnits = computed(() => {
   const query = searchTerm.value.trim().toLowerCase()
@@ -77,15 +87,29 @@ const filteredUnits = computed(() => {
 })
 
 const paginatedUnits = computed(() => {
-  const start = (currentPage.value - 1) * rowsPerPage
-  const end = start + rowsPerPage
+  if (rowsPerPage.value === 'all') {
+    return filteredUnits.value
+  }
+
+  const start = (currentPage.value - 1) * rowsPerPage.value
+  const end = start + rowsPerPage.value
 
   return filteredUnits.value.slice(start, end)
 })
 
-const pageCount = computed(() => Math.ceil(filteredUnits.value.length / rowsPerPage))
+const pageCount = computed(() => {
+  if (rowsPerPage.value === 'all') {
+    return 1
+  }
+
+  return Math.ceil(filteredUnits.value.length / rowsPerPage.value)
+})
 
 function changePage(page) {
   currentPage.value = page
 }
+
+watch([searchTerm, rowsPerPage], () => {
+  currentPage.value = 1
+})
 </script>

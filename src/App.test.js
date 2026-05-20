@@ -73,4 +73,31 @@ describe('App', () => {
     expect(wrapper.text()).toContain('ACC10007')
     expect(wrapper.text()).not.toContain('ICT10001')
   })
+
+  it('changes how many rows are shown per page', async () => {
+    const wrapper = mount(App)
+
+    await wrapper.get('select').setValue('10')
+
+    expect(visibleRows(wrapper)).toHaveLength(10)
+    expect(wrapper.text()).toContain('ACC10007')
+    expect(wrapper.text()).not.toContain('INF30001')
+  })
+
+  it('can show all rows and returns to the first page when controls change', async () => {
+    const wrapper = mount(App)
+    const pageTwoLink = wrapper
+      .findAll('.page-link')
+      .find((link) => link.text() === '2')
+
+    await pageTwoLink.trigger('click')
+    expect(wrapper.text()).toContain('TNE10005')
+
+    await wrapper.get('input[type="search"]').setValue('Core')
+    expect(wrapper.text()).toContain('ICT10001')
+    expect(wrapper.text()).not.toContain('TNE10005')
+
+    await wrapper.get('select').setValue('all')
+    expect(visibleRows(wrapper)).toHaveLength(4)
+  })
 })
