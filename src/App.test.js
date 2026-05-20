@@ -100,4 +100,13 @@ describe('App', () => {
     await wrapper.get('select').setValue('all')
     expect(visibleRows(wrapper)).toHaveLength(4)
   })
+
+  it('shows a helpful message when no units match the search', async () => {
+    const wrapper = mount(App)
+
+    await wrapper.get('input[type="search"]').setValue('not-a-real-unit')
+
+    expect(visibleRows(wrapper)).toHaveLength(0)
+    expect(wrapper.text()).toContain('No units match your search.')
+  })
 })

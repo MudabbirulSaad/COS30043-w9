@@ -1,6 +1,11 @@
 <template>
   <main class="container py-4">
-    <h1 class="mb-3">Lab 09 Pagination</h1>
+    <div class="mb-4">
+      <h1 class="mb-1">Lab 09 Pagination</h1>
+      <p class="text-secondary mb-0">
+        Browse, search, and paginate Swinburne units.
+      </p>
+    </div>
 
     <div class="row g-3 align-items-end mb-3">
       <div class="col-12 col-md-8">
@@ -23,8 +28,12 @@
       </div>
     </div>
 
+    <p class="small text-secondary mb-2">
+      Showing {{ paginatedUnits.length }} of {{ filteredUnits.length }} matching units
+    </p>
+
     <div class="table-responsive">
-      <table class="table table-striped table-hover align-middle">
+      <table class="table table-striped table-hover align-middle mb-0">
         <thead class="table-dark">
           <tr>
             <th scope="col">Unit Code</th>
@@ -44,6 +53,10 @@
       </table>
     </div>
 
+    <p v-if="filteredUnits.length === 0" class="alert alert-info mt-3 mb-0">
+      No units match your search.
+    </p>
+
     <Paginate
       v-if="pageCount > 1"
       v-model="currentPage"
@@ -59,6 +72,7 @@
       :next-class="'page-item'"
       :next-link-class="'page-link'"
       :active-class="'active'"
+      class="mt-3"
     />
   </main>
 </template>
